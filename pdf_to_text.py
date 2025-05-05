@@ -1,5 +1,7 @@
 import os
 import pdfplumber
+import fitz
+fitz.TOOLS.mupdf_display_errors(False)
 
 INPUT_DIR = "input_pdfs"
 OUTPUT_DIR = "output_texts"
