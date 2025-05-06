@@ -1,10 +1,7 @@
 import os
 import pdfplumber
-<<<<<<< HEAD
-=======
 import fitz
 fitz.TOOLS.mupdf_display_errors(False)
->>>>>>> 8ce1e043d35217a1ac7a44a1695f71738f422e6f
 
 INPUT_DIR = "input_pdfs"
 OUTPUT_DIR = "output_texts"
