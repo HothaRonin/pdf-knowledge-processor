@@ -2,6 +2,8 @@ import os
 import pdfplumber
 import fitz
 fitz.TOOLS.mupdf_display_errors(False)
+import logging
+logging.getLogger("pdfminer").setLevel(logging.ERROR)
 
 INPUT_DIR = "input_pdfs"
 OUTPUT_DIR = "output_texts"
