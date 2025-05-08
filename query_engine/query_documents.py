@@ -3,7 +3,7 @@ import sys
 print("PYTHON PATH:\n", sys.path)
 print("PYTHON EXECUTABLE:\n", sys.executable)
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
-from llama_index.llms import LlamaCPP
+from llama_index.llms.llama_cpp import LlamaCPP
 from llama_index.embeddings import HuggingFaceEmbedding
 
 # Path to your local GGUF model
