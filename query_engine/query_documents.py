@@ -1,45 +1,43 @@
-import os
 import sys
+import os
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.llms.llama_cpp import LlamaCPP
+from llama_index.core.settings import Settings
+
 print("PYTHON PATH:\n", sys.path)
 print("PYTHON EXECUTABLE:\n", sys.executable)
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
-from llama_index.llms.llama_cpp import LlamaCPP
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-# Path to your local GGUF model
-MODEL_PATH = "/Users/joles/.lmstudio/models/NousResearch/Hermes-2-Pro-Llama-3-8B-GGUF/Hermes-2-Pro-Llama-3-8B-Q4_K_M.gguf"
+# Load documents
+documents = SimpleDirectoryReader("data").load_data()
 
-# Set up the LLM (local)
-llm = LlamaCPP(
-    model_path=MODEL_PATH,
-    temperature=0.1,
-    max_new_tokens=512,
-    context_window=4096,
-    generate_kwargs={"top_p": 0.95, "top_k": 40},
-    model_kwargs={"n_gpu_layers": 100, "n_ctx": 4096}
-)
-
-# Use a local HuggingFace embedding model
+# Initialize embedding model
 embed_model = HuggingFaceEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-# Service context for LlamaIndex
-service_context = ServiceContext.from_defaults(
-    llm=llm,
-    embed_model=embed_model,
-    chunk_size=512,
-    chunk_overlap=64,
+# Initialize LlamaCPP model
+llm = LlamaCPP(
+    model_path=os.path.expanduser("~/.lmstudio/models/NousResearch/Hermes-2-Pro-Llama-3-8B-GGUF/Hermes-2-Pro-Llama-3-8B-Q4_K_M.gguf"),
+    temperature=0.1,
+    max_new_tokens=256,
+    context_window=4096,
+    generate_kwargs={},
+    model_kwargs={"n_gpu_layers": 32},
+    verbose=True,
 )
 
-# Load documents from local folder
-documents = SimpleDirectoryReader("output_texts").load_data()
-index = VectorStoreIndex.from_documents(documents, service_context=service_context)
+# Configure global settings
+settings = Settings()
+settings.llm = llm
+settings.embed_model = embed_model
 
-# Interactive loop
+# Build the vector index
+index = VectorStoreIndex.from_documents(documents, settings=settings)
+
+# Create a query engine
 query_engine = index.as_query_engine()
-while True:
-    query = input("\nAsk a question about your documents: ")
-    if query.lower() in {"exit", "quit"}:
-        break
-    response = query_engine.query(query)
-    print(f"\nResponse:\n{response}")
+
+# Run a test query
+response = query_engine.query("What is the document about?")
+print(response)
+
 
